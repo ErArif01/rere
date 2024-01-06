@@ -1,0 +1,22 @@
+name: Schedule Reminder Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      reminderTime:
+        description: 'Time for the reminder (in UTC)'
+        required: true
+
+jobs:
+  schedule_reminder:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up reminder workflow
+      run: |
+        echo "Setting up reminder for ${{ github.event.inputs.reminderTime }}"
+        # Trigger the Reminder workflow with the specified time
+        curl -X POST \
+             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+             -H "Content-Type: application/json" \
+             -d "{\"ref\":\"main\", \"inputs\":{\"scheduled_time\":\"${{ github.event.inputs.reminderTime }}\"}}" \
+             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/main.yml/dispatches"
